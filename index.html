@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+  <title>CSV/JSON Schema Validator & Data Profiler · Developer tool</title>
+  <meta name="description" content="Validate CSV and JSON schemas, profile data types, detect mismatches. Free browser‑based tool for developers, analysts, and Shopify sellers.">
+  <meta name="keywords" content="csv validator, json schema validator, csv data profiler, shopify seo audit, etsy seo score, csv/json tools, developer tools, shopify sellers, csv/json schema validator & data profiler">
+  <meta name="author" content="Organism Metrics">
+  <meta name="robots" content="index, follow">
+  <!-- Open Graph -->
+  <meta property="og:title" content="CSV/JSON Schema Validator & Data Profiler">
+  <meta property="og:description" content="Validate & profile CSV/JSON structures instantly. No uploads, 100% browser side.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://example.com/csv-json-validator">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="CSV/JSON Schema Validator & Data Profiler">
+  <meta name="twitter:description" content="Validate & profile CSV/JSON structures instantly. No uploads, 100% browser side.">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      background: #f5f7fc;
+      color: #1e293b;
+      padding: 1.5rem 1rem 3rem;
+      line-height: 1.5;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      background: linear-gradient(145deg, #0f172a, #1e3a5f);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.25rem;
+    }
+    .subhead {
+      font-size: 1.1rem;
+      color: #475569;
+      max-width: 700px;
+      margin: 0.5rem auto 1rem;
+    }
+    .badge {
+      background: #dbeafe;
+      color: #1e40af;
+      padding: 0.3rem 0.9rem;
+      border-radius: 40px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      display: inline-block;
+      margin-bottom: 0.5rem;
+    }
+    .tool-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+    @media (max-width: 720px) {
+      .tool-grid {
+        grid-template-columns: 1fr;
+        gap: 1.2rem;
+      }
+    }
+    .card {
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 1.5rem;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.03), 0 2px 6px rgba(0,20,50,0.05);
+      border: 1px solid #e9edf4;
+      transition: box-shadow 0.2s;
+    }
+    .card:hover {
+      box-shadow: 0 12px 28px rgba(0,0,0,0.06);
+    }
+    .card h2 {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #0b1e33;
+    }
+    textarea {
+      width: 100%;
+      min-height: 170px;
+      padding: 0.9rem 1rem;
+      border: 1px solid #cfdbe8;
+      border-radius: 16px;
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      font-size: 0.85rem;
+      background: #fafcff;
+      resize: vertical;
+      transition: border 0.2s;
+      margin-bottom: 0.8rem;
+    }
+    textarea:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+    }
+    .btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin: 0.5rem 0 0.2rem;
+    }
+    .btn {
+      background: #f1f5f9;
+      border: none;
+      padding: 0.5rem 1.2rem;
+      border-radius: 40px;
+      font-weight: 500;
+      font-size: 0.9rem;
+      color: #1e293b;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      border: 1px solid transparent;
+    }
+    .btn-primary {
+      background: #1e3a5f;
+      color: white;
+      box-shadow: 0 2px 6px rgba(30,58,95,0.2);
+    }
+    .btn-primary:hover {
+      background: #14324e;
+      transform: scale(0.98);
+    }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid #cbd5e1;
+    }
+    .btn-outline:hover {
+      background: #eef2f7;
+    }
+    .btn-sm {
+      padding: 0.3rem 1rem;
+      font-size: 0.8rem;
+    }
+    .output-box {
+      background: #f8fafc;
+      border-radius: 16px;
+      padding: 1rem 1.2rem;
+      margin-top: 1rem;
+      border: 1px solid #e2e8f0;
+      font-size: 0.9rem;
+      max-height: 260px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: 'SF Mono', monospace;
+    }
+    .output-box.success {
+      border-left: 4px solid #16a34a;
+    }
+    .output-box.error {
+      border-left: 4px solid #dc2626;
+    }
+    .output-box.profile {
+      border-left: 4px solid #2563eb;
+    }
+    .placeholder-ad {
+      background: #f1f5fe;
+      border-radius: 20px;
+      padding: 1.2rem 1.5rem;
+      margin: 1.8rem 0 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px dashed #a0b8d9;
+    }
+    .placeholder-ad span {
+      font-weight: 500;
+      color: #1e3a5f;
+    }
+    .placeholder-ad .ad-badge {
+      background: #d4e2fc;
+      padding: 0.2rem 0.8rem;
+      border-radius: 40px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: #1e4a7a;
+    }
+    .affiliate-resources {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.2rem;
+      background: #ffffffd6;
+      backdrop-filter: blur(2px);
+      border-radius: 28px;
+      padding: 1.5rem 1.8rem;
+      margin: 1.8rem 0 1.5rem;
+      border: 1px solid #dce3ef;
+      justify-content: center;
+    }
+    .affiliate-item {
+      background: #f1f5f9;
+      border-radius: 60px;
+      padding: 0.4rem 1.3rem;
+      font-size: 0.9rem;
+      color: #0b2b44;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      border: 1px solid transparent;
+      transition: 0.1s;
+    }
+    .affiliate-item:hover {
+      background: #e2eaf5;
+      border-color: #b9cae0;
+    }
+    .privacy-note {
+      font-size: 0.75rem;
+      color: #5f6c84;
+      background: #edf2f9;
+      padding: 0.6rem 1.2rem;
+      border-radius: 60px;
+      display: inline-block;
+      margin-top: 1.5rem;
+    }
+    .flex-between {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .footer-meta {
+      margin-top: 2.5rem;
+      border-top: 1px solid #dce3ef;
+      padding-top: 1.2rem;
+      text-align: center;
+    }
+    .sample-badge {
+      background: #eef2f6;
+      border-radius: 30px;
+      padding: 0.2rem 0.8rem;
+      font-size: 0.7rem;
+      cursor: pointer;
+    }
+    .sample-badge:hover {
+      background: #dce4ef;
+    }
+    .icon-small {
+      font-size: 1.1rem;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="badge">🧪 developer tool · no upload</div>
+    <h1>CSV/JSON Schema Validator & Data Profiler</h1>
+    <div class="subhead">Validate structure, detect schema mismatches, and profile data types — all in your browser.</div>
+  </header>
+
+  <!-- Tool grid: CSV left, JSON right -->
+  <div class="tool-grid">
+    <!-- CSV card -->
+    <div class="card">
+      <h2><span>📊</span> CSV Validator & Profiler</h2>
+      <textarea id="csvInput" placeholder="Paste CSV data (first row = headers)&#10;e.g. name,age,email&#10;Alice,32,alice@example.com&#10;Bob,28,bob@test.org">name,age,email
+Alice,32,alice@example.com
+Bob,28,bob@test.org
+Carol,29,carol@shopify.com</textarea>
+      <div class="btn-group">
+        <button class="btn btn-primary" id="validateCsvBtn">✅ Validate & Profile</button>
+        <button class="btn btn-outline btn-sm" id="csvSampleBtn">↻ load sample</button>
+      </div>
+      <div id="csvOutput" class="output-box" style="min-height:70px;">⏳ Results appear here</div>
+    </div>
+
+    <!-- JSON card -->
+    <div class="card">
+      <h2><span>🧩</span> JSON Schema Validator</h2>
+      <textarea id="jsonInput" placeholder='Paste JSON array or object&#10;e.g. [{"id":1,"title":"SEO audit"}]'>[
+  { "product": "shopify seo", "price": 29, "inStock": true },
+  { "product": "etsy score", "price": 15, "inStock": false },
+  { "product": "csv tool", "price": 0, "inStock": true }
+]</textarea>
+      <div class="btn-group">
+        <button class="btn btn-primary" id="validateJsonBtn">🔍 Validate & Profile</button>
+        <button class="btn btn-outline btn-sm" id="jsonSampleBtn">↻ load sample</button>
+      </div>
+      <div id="jsonOutput" class="output-box" style="min-height:70px;">⏳ Results appear here</div>
+    </div>
+  </div>
+
+  <!-- Ad placeholder (visible) -->
+  <div class="placeholder-ad">
+    <span><span class="ad-badge">📌 SPONSOR</span> &nbsp;⚡ Supercharge your data workflows</span>
+    <span style="font-size:0.9rem; color:#1f3a57;">→ <a href="#" style="text-decoration:none; color:#1d4ed8; font-weight:500;" onclick="reportEvent('ad_click',{ad:'data_tool_affiliate'}); return false;">Try DataWizard Pro (affiliate)</a></span>
+  </div>
+
+  <!-- Affiliate / resource section -->
+  <div class="affiliate-resources">
+    <span class="affiliate-item">📘 <a href="#" style="text-decoration:none; color:inherit;" onclick="reportEvent('affiliate_click',{resource:'shopify_seo_audit'}); return false;">Shopify SEO audit guide</a></span>
+    <span class="affiliate-item">📈 <a href="#" style="text-decoration:none; color:inherit;" onclick="reportEvent('affiliate_click',{resource:'etsy_score_checker'}); return false;">Etsy score checker</a></span>
+    <span class="affiliate-item">🧰 <a href="#" style="text-decoration:none; color:inherit;" onclick="reportEvent('affiliate_click',{resource:'csv_json_tools_pro'}); return false;">CSV/JSON Tools Pro</a></span>
+    <span class="affiliate-item">📊 <a href="#" style="text-decoration:none; color:inherit;" onclick="reportEvent('affiliate_click',{resource:'data_profiler_plus'}); return false;">Data Profiler+</a></span>
+  </div>
+
+  <!-- Privacy note + event reporting -->
+  <div class="flex-between">
+    <div class="privacy-note">
+      🔒 Privacy: events may be counted anonymously for product improvement. No credentials collected.
+    </div>
+    <div style="font-size:0.7rem; color:#64748b;">
+      <span>v1.0 · organism metrics</span>
+    </div>
+  </div>
+  <div class="footer-meta">
+    <span style="opacity:0.6;">🔧 built for developers & Shopify/Etsy sellers</span>
+  </div>
+</div>
+
+<script>
+  (function() {
+    // ---------- reporting ----------
+    window.reportEvent = function(name, payload) {
+      if (typeof window.ORGANISM_METRICS_ENDPOINT === 'string' && window.ORGANISM_METRICS_ENDPOINT.length > 0) {
+        try {
+          fetch(window.ORGANISM_METRICS_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ event: name, payload: payload || {}, ts: Date.now() }),
+            keepalive: true
+          }).catch(() => {});
+        } catch (e) { /* silent */ }
+      }
+    };
+
+    // ---------- DOM refs ----------
+    const csvInput = document.getElementById('csvInput');
+    const jsonInput = document.getElementById('jsonInput');
+    const csvOutput = document.getElementById('csvOutput');
+    const jsonOutput = document.getElementById('jsonOutput');
+
+    // helpers
+    function setOutput(el, msg, type = '') {
+      el.textContent = msg;
+      el.className = 'output-box';
+      if (type) el.classList.add(type);
+    }
+
+    // ---------- CSV validate & profile ----------
+    function validateAndProfileCSV(raw) {
+      if (!raw || raw.trim().length === 0) {
+        return { valid: false, error: 'Empty input.' };
+      }
+      const lines = raw.split(/\r?\n/).filter(line => line.trim() !== '');
+      if (lines.length < 1) return { valid: false, error: 'No rows detected.' };
+      const headerLine = lines[0];
+      const headers = parseCSVLine(headerLine);
+      if (headers.length < 1) return { valid: false, error: 'No columns found in header.' };
+      if (lines.length < 2) {
+        return { valid: true, headers, rowCount: 0, columnCount: headers.length, types: {}, warnings: ['No data rows (only header).'] };
+      }
+      const dataRows = lines.slice(1);
+      const rowCount = dataRows.length;
+      // detect column types (per column)
+      const colTypes = {};
+      headers.forEach(h => { colTypes[h] = new Set(); });
+      let typeMap = {};
+      headers.forEach(h => { typeMap[h] = []; });
+      let parseErrors = 0;
+      dataRows.forEach((row, idx) => {
+        const cells = parseCSVLine(row);
+        if (cells.length === 0) return; // empty row
+        headers.forEach((h, i) => {
+          let val = (i < cells.length) ? cells[i].trim() : '';
+          if (val === '') {
+            colTypes[h].add('(empty)');
+            typeMap[h].push(null);
+          } else {
+            // infer type
+            if (!isNaN(Number(val)) && val !== '') {
+              colTypes[h].add('number');
+              typeMap[h].push(Number(val));
+            } else if (val.toLowerCase() === 'true' || val.toLowerCase() === 'false') {
+              colTypes[h].add('boolean');
+              typeMap[h].push(val.toLowerCase() === 'true');
+            } else {
+              colTypes[h].add('string');
+              typeMap[h].push(val);
+            }
+          }
+        });
+        if (cells.length !== headers.length) parseErrors++;
+      });
+      // build profile
+      let profileLines = [];
+      let schemaValid = true;
+      let warnings = [];
+      headers.forEach(h => {
+        const types = Array.from(colTypes[h]);
+        profileLines.push(`  "${h}": [${types.join(', ')}]`);
+        if (types.length > 1 && !(types.length === 2 && types.includes('(empty)'))) {
+          schemaValid = false;
+          warnings.push(`Column "${h}" has mixed types: ${types.join(', ')}`);
+        }
+      });
+      if (parseErrors > 0) warnings.push(`${parseErrors} row(s) have column count mismatch.`);
+      let summary = `✅ CSV valid · ${rowCount} rows, ${headers.length} columns\n`;
+      if (warnings.length > 0) summary += `⚠️ ${warnings.length} warning(s)\n`;
+      summary += `📋 Column types:\n${profileLines.join('\n')}`;
+      if (!schemaValid) summary += `\n⚠️ Schema inconsistency (mixed types).`;
+      return { valid: schemaValid, summary, warnings, rowCount, headers };
+    }
+
+    function parseCSVLine(line) {
+      const result = [];
+      let current = '';
+      let inQuotes = false;
+      for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (inQuotes) {
+          if (ch === '"') {
+            if (i + 1 < line.length && line[i+1] === '"') {
+              current += '"';
+              i++;
+            } else {
+              inQuotes = false;
+            }
+          } else {
+            current += ch;
+          }
+        } else {
+          if (ch === '"') {
+            inQuotes = true;
+          } else if (ch === ',') {
+            result.push(current);
+            current = '';
+          } else {
+            current += ch;
+          }
+        }
+      }
+      result.push(current);
+      return result;
+    }
+
+    // ---------- JSON validate & profile ----------
+    function validateAndProfileJSON(raw) {
+      if (!raw || raw.trim().length === 0) {
+        return { valid: false, error: 'Empty JSON input.' };
+      }
+      let parsed;
+      try {
+        parsed = JSON.parse(raw);
+      } catch (e) {
+        return { valid: false, error: `Invalid JSON: ${e.message}` };
+      }
+      // ensure array for profiling
+      let arr = Array.isArray(parsed) ? parsed : [parsed];
+      if (arr.length === 0) {
+        return { valid: true, summary: '✅ Valid JSON (empty array).', rowCount: 0 };
+      }
+      // get all keys
+      const allKeys = new Set();
+      arr.forEach(item => {
+        if (typeof item === 'object' && item !== null) {
+          Object.keys(item).forEach(k => allKeys.add(k));
+        }
+      });
+      const keys = Array.from(allKeys);
+      if (keys.length === 0) {
+        return { valid: true, summary: '✅ Valid JSON array (scalar items, no keys).', rowCount: arr.length };
+      }
+      // profile types per key
+      const keyTypes = {};
+      keys.forEach(k => { keyTypes[k] = new Set(); });
+      let nullCount = 0;
+      arr.forEach(item => {
+        if (typeof item !== 'object' || item === null) {
+          nullCount++;
+          return;
+        }
+        keys.forEach(k => {
+          if (k in item) {
+            const val = item[k];
+            if (val === null) keyTypes[k].add('null');
+            else if (Array.isArray(val)) keyTypes[k].add('array');
+            else if (typeof val === 'boolean') keyTypes[k].add('boolean');
+            else if (typeof val === 'number') keyTypes[k].add('number');
+            else if (typeof val === 'string') keyTypes[k].add('string');
+            else keyTypes[k].add(typeof val);
+          } else {
+            keyTypes[k].add('(missing)');
+          }
+        });
+      });
+      let profile = [];
+      let schemaConsistent = true;
+      let warnings = [];
+      keys.forEach(k => {
+        const types = Array.from(keyTypes[k]);
+        profile.push(`  "${k}": [${types.join(', ')}]`);
+        if (types.length > 1 && !(types.length === 2 && (types.includes('(missing)') || types.includes('null')))) {
+          schemaConsistent = false;
+          warnings.push(`Key "${k}" has mixed types: ${types.join(', ')}`);
+        }
+      });
+      let summary = `✅ JSON valid · ${arr.length} object(s), ${keys.length} key(s)\n`;
+      if (warnings.length) summary += `⚠️ ${warnings.length} schema warning(s)\n`;
+      summary += `📋 Key types:\n${profile.join('\n')}`;
+      if (!schemaConsistent) summary += `\n⚠️ Schema inconsistency (mixed types).`;
+      return { valid: schemaConsistent, summary, warnings, rowCount: arr.length };
+    }
+
+    // ---------- UI wiring ----------
+    document.getElementById('validateCsvBtn').addEventListener('click', function() {
+      const raw = csvInput.value;
+      const result = validateAndProfileCSV(raw);
+      if (result.error) {
+        setOutput(csvOutput, `❌ ${result.error}`, 'error');
+        reportEvent('csv_validation', { valid: false, error: result.error });
+      } else {
+        let out = result.summary;
+        setOutput(csvOutput, out, result.valid ? 'success' : 'error');
+        reportEvent('csv_validation', { valid: result.valid, rows: result.rowCount, warnings: result.warnings?.length || 0 });
+      }
+    });
+
+    document.getElementById('validateJsonBtn').addEventListener('click', function() {
+      const raw = jsonInput.value;
+      const result = validateAndProfileJSON(raw);
+      if (result.error) {
+        setOutput(jsonOutput, `❌ ${result.error}`, 'error');
+        reportEvent('json_validation', { valid: false, error: result.error });
+      } else {
+        let out = result.summary;
+        setOutput(jsonOutput, out, result.valid ? 'success' : 'error');
+        reportEvent('json_validation', { valid: result.valid, rows: result.rowCount, warnings: result.warnings?.length || 0 });
+      }
+    });
+
+    // sample loaders
+    document.getElementById('csvSampleBtn').addEventListener('click', function() {
+      csvInput.value = `product,price,stock,category
+Shopify SEO Audit,49,true,seo
+Etsy Score Booster,19,false,etsy
+CSV Profiler,0,true,developer
+JSON Schema Tool,12,true,utility`;
+      setOutput(csvOutput, '↻ Sample CSV loaded. Click "Validate & Profile"', '');
+      reportEvent('sample_loaded', { type: 'csv' });
+    });
+    document.getElementById('jsonSampleBtn').addEventListener('click', function() {
+      jsonInput.value = `[
+  { "tool": "CSV Validator", "rating": 4.8, "free": true },
+  { "tool": "JSON Schema Lint", "rating": 4.5, "free": true },
+  { "tool": "Shopify SEO Analyzer", "rating": 4.9, "free": false }
+]`;
+      setOutput(jsonOutput, '↻ Sample JSON loaded. Click "Validate & Profile"', '');
+      reportEvent('sample_loaded', { type: 'json' });
+    });
+
+    // initial placeholder messages
+    setOutput(csvOutput, '📋 Paste CSV or click "load sample" → then validate', '');
+    setOutput(jsonOutput, '📋 Paste JSON or click "load sample" → then validate', '');
+
+    // report page view (anonymous)
+    reportEvent('page_view', { tool: 'csv_json_validator_profiler' });
+
+  })();
+</script>
+
+<!-- Endpoint placeholder (not configured by default) -->
+<script>
+  // If you set window.ORGANISM_METRICS_ENDPOINT to a valid URL, events will be posted.
+  // e.g. window.ORGANISM_METRICS_ENDPOINT = "https://your-metrics.example.com/event";
+  // No endpoint configured by default – fully private.
+</script>
+
+<section data-organism-discovery="hub" style="margin:32px auto 20px;max-width:1040px;padding:16px;border-top:1px solid #d9e2ec;color:#475569;font:14px/1.5 system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">
+  <strong style="display:block;color:#0f172a;margin-bottom:6px">More free browser tools</strong>
+  <p style="margin:0 0 8px">This page is part of an autonomous micro-tool network. Explore the live tool directory and related utilities.</p>
+  <p style="margin:0"><a href="https://kingms888.github.io/do-digital-organism-index/" style="color:#0f766e;font-weight:700">Open the tool directory</a> </p>
+</section>
+</body>
+</html>
